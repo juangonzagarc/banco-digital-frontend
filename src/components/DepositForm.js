@@ -44,8 +44,8 @@ function DepositForm() {
                         Selecciona una cuenta
                     </option>
                     {accounts.map((account) => (
-                        <option key={account.id} value={account.id}>
-                            {account.id} - {account.nombre} (Saldo: {account.balance})
+                        <option key={account.numeroCuenta} value={account.numeroCuenta}>
+                            {account.numeroCuenta} - {account.cliente.nombre} (Saldo: {parseFloat(account.saldo).toFixed(2)})
                         </option>
                     ))}
                 </select>

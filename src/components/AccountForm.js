@@ -1,27 +1,48 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { createAccount } from './api';
 
-const AccountForm = ({ onSubmit }) => {
+function AccountForm() {
     const [cedula, setCedula] = useState('');
     const [nombre, setNombre] = useState('');
-    const [balance, setBalance] = useState(0);
+    const [saldo, setSaldo] = useState('');
+    const [error, setError] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Enviando datos:", { cedula, nombre, balance });
-        onSubmit({ cedula, nombre, balance });
+
+        if (!cedula || !nombre || saldo < 0) {
+            setError('Por favor, completa todos los campos correctamente.');
+            return;
+        }
+
+        const newAccount = {
+            cedula,
+            nombre,
+            balance: saldo  // Usa 'balance' en lugar de 'saldo' para que coincida con el DTO
+        };
+
+        try {
+            await createAccount(newAccount);
+            alert('Cuenta creada con éxito');
+            // Resetea los campos del formulario
+            setCedula('');
+            setNombre('');
+            setSaldo('');
+            setError('');
+        } catch (error) {
+            setError('Error al crear la cuenta: ' + error.message);
+        }
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <label>ID de Documento:</label>
             <input
                 type="text"
+                placeholder="Cédula"
                 value={cedula}
                 onChange={(e) => setCedula(e.target.value)}
-                placeholder="Ingrese ID de documento"
+                required
             />
-
-            <label>Nombre:</label>
             <input
                 type="text"
                 placeholder="Nombre"
@@ -29,20 +50,17 @@ const AccountForm = ({ onSubmit }) => {
                 onChange={(e) => setNombre(e.target.value)}
                 required
             />
-
-
-            <label>Saldo Inicial:</label>
             <input
                 type="number"
-                value={balance}
-                onChange={(e) => setBalance(Number(e.target.value))}
-                placeholder="Ingrese saldo inicial"
-                min="0"
+                placeholder="Saldo"
+                value={saldo}
+                onChange={(e) => setSaldo(e.target.value)}
+                required
             />
-
+            {error && <p style={{ color: 'red' }}>{error}</p>}
             <button type="submit">Crear Cuenta</button>
         </form>
     );
-};
+}
 
 export default AccountForm;
